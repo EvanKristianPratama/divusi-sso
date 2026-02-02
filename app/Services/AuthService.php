@@ -80,8 +80,11 @@ class AuthService
     public function logout(): void
     {
         Auth::logout();
-        request()->session()->invalidate();
-        request()->session()->regenerateToken();
+
+        if (request()->hasSession()) {
+            request()->session()->invalidate();
+            request()->session()->regenerateToken();
+        }
     }
 
     /**
