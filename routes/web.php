@@ -1,24 +1,31 @@
 <?php
 
+use App\Http\Controllers\SsoController;
+use App\Services\AuthService;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\SsoController;
 
-// Login page
-Route::get('/login', function () {
-    return view('auth.login');
-})->name('login');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
-// Dashboard (protected)
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware('auth')->name('dashboard');
+// Guest Routes
+Route::middleware('guest')->group(function () {
+    Route::view('/', 'auth.login')->name('home');
+    Route::view('/login', 'auth.login')->name('login');
+});
 
-// SSO redirect ke apps lain
-Route::get('/sso/redirect/{app}', [SsoController::class, 'redirectToApp'])
-    ->middleware('auth')
-    ->name('sso.redirect');
+// Auth Routes
+Route::middleware('auth')->group(function () {
+    Route::view('/dashboard', 'dashboard')->name('dashboard');
+    
+    Route::post('/logout', function (AuthService $auth) {
+        $auth->logout();
+        return redirect('/login');
+    })->name('logout');
 
-// Welcome page
-Route::get('/', function () {
-    return view('welcome');
+    // SSO Redirect
+    Route::get('/sso/redirect/{app}', [SsoController::class, 'redirect'])
+        ->name('sso.redirect');
 });

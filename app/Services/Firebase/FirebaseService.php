@@ -2,35 +2,38 @@
 
 namespace App\Services\Firebase;
 
+use App\Exceptions\FirebaseTokenException;
 use Kreait\Firebase\Auth as FirebaseAuth;
 use Kreait\Firebase\Exception\Auth\FailedToVerifyToken;
-use App\Exceptions\FirebaseTokenException;
 
+/**
+ * Service untuk handle Firebase Authentication
+ * Single Responsibility: Hanya untuk verify token Firebase
+ */
 class FirebaseService
 {
-    public function __construct(protected FirebaseAuth $auth)
-    {
-    }
+    public function __construct(
+        private FirebaseAuth $auth
+    ) {}
 
     /**
-     * Verify Firebase ID Token
+     * Verify Firebase ID Token dan return user data
      *
-     * @param string $idToken
-     * @return array
      * @throws FirebaseTokenException
      */
     public function verifyToken(string $idToken): array
     {
         try {
-            $verifiedIdToken = $this->auth->verifyIdToken($idToken);
+            $verified = $this->auth->verifyIdToken($idToken);
+            $claims = $verified->claims();
 
             return [
-                'firebase_uid' => $verifiedIdToken->claims()->get('sub'),
-                'email' => $verifiedIdToken->claims()->get('email'),
-                'name' => $verifiedIdToken->claims()->get('name'),
+                'firebase_uid' => $claims->get('sub'),
+                'email' => $claims->get('email'),
+                'name' => $claims->get('name') ?? $claims->get('email'),
             ];
         } catch (FailedToVerifyToken $e) {
-            throw new FirebaseTokenException('Token tidak valid: ' . $e->getMessage());
+            throw new FirebaseTokenException("Token tidak valid: {$e->getMessage()}");
         }
     }
 }

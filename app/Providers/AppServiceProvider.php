@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\Firebase\FirebaseService;
+use App\Services\SsoService;
 use Illuminate\Support\ServiceProvider;
 use Kreait\Firebase\Factory;
 
@@ -19,6 +20,8 @@ class AppServiceProvider extends ServiceProvider
 
             return new FirebaseService($factory->createAuth());
         });
+
+        $this->app->singleton(SsoService::class);
     }
 
     /**

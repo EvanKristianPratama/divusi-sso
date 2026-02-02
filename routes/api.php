@@ -1,19 +1,31 @@
 <?php
 
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\SsoController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\AuthFirebaseController;
-use App\Http\Controllers\Auth\SsoController;
 
-// Auth routes - pakai web middleware untuk share session
-Route::middleware(['web'])->group(function () {
-    Route::post('/auth/register', [AuthFirebaseController::class, 'register']);
-    Route::post('/auth/login', [AuthFirebaseController::class, 'login']);
-    Route::post('/auth/logout', [AuthFirebaseController::class, 'logout']);
-    Route::get('/auth/me', [AuthFirebaseController::class, 'me']);
-    
-    // SSO untuk integrasi ke apps lain
-    Route::post('/sso/generate-token', [SsoController::class, 'generateToken']);
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+| Prefix: /api
+*/
+
+// Auth Routes (pakai web middleware untuk session)
+Route::middleware('web')->prefix('auth')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/me', [AuthController::class, 'me']);
 });
 
-// SSO validation - stateless untuk apps eksternal
-Route::post('/sso/validate', [SsoController::class, 'validateToken']);
+// SSO Routes
+Route::prefix('sso')->group(function () {
+    // Public: untuk apps lain validate token
+    Route::post('/validate', [SsoController::class, 'validate']);
+    
+    // Protected: generate token (butuh auth)
+    Route::middleware(['web', 'auth'])->group(function () {
+        Route::post('/generate', [SsoController::class, 'generate']);
+    });
+});
