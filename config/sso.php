@@ -3,33 +3,44 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | SSO Configuration
+    | Portal Configuration
     |--------------------------------------------------------------------------
+    | Divusi SSO Portal - Menampilkan daftar modul yang tersedia
+    | User akan di-redirect ke halaman login masing-masing modul
     */
 
-    // Token expiry dalam menit
-    'token_expiry_minutes' => (int) env('SSO_TOKEN_EXPIRY', 5),
-
-    // Daftar aplikasi yang terintegrasi
+    // Daftar aplikasi/modul yang tersedia
     'apps' => [
         'cobit' => [
-            'name' => 'COBIT',
-            'callback_url' => env('SSO_COBIT_URL', 'http://localhost:8001/sso/callback'),
+            'name' => 'COBIT Assessment',
+            'description' => 'Sistem penilaian dan audit tata kelola IT berbasis COBIT 2019',
+            'url' => env('APP_COBIT_URL', 'http://cobit.divusi.local'),
+            'icon' => 'shield-check', // heroicons name
+            'color' => 'emerald',
             'enabled' => true,
         ],
         'pmo' => [
-            'name' => 'PMO',
-            'callback_url' => env('SSO_PMO_URL', 'http://localhost:8002/sso/callback'),
+            'name' => 'Project Management Office',
+            'description' => 'Pengelolaan proyek, timeline, dan resource perusahaan',
+            'url' => env('APP_PMO_URL', 'http://pmo.divusi.local'),
+            'icon' => 'clipboard-document-check',
+            'color' => 'blue',
             'enabled' => true,
         ],
         'hr' => [
             'name' => 'HR Management',
-            'callback_url' => env('SSO_HR_URL', 'http://localhost:8003/sso/callback'),
+            'description' => 'Pengelolaan SDM, absensi, dan payroll karyawan',
+            'url' => env('APP_HR_URL', 'http://hr.divusi.local'),
+            'icon' => 'users',
+            'color' => 'violet',
             'enabled' => false,
         ],
         'finance' => [
-            'name' => 'Finance',
-            'callback_url' => env('SSO_FINANCE_URL', 'http://localhost:8004/sso/callback'),
+            'name' => 'Finance & Accounting',
+            'description' => 'Pengelolaan keuangan, budgeting, dan laporan finansial',
+            'url' => env('APP_FINANCE_URL', 'http://finance.divusi.local'),
+            'icon' => 'currency-dollar',
+            'color' => 'amber',
             'enabled' => false,
         ],
     ],
